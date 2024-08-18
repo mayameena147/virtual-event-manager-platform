@@ -21,7 +21,7 @@ describe('Event Management Platform', () => {
                     name: 'testuser',
                     password: 'testpassword',
                     email: "test@gmail.com",
-                    role: "organiser"
+                    role: "organizer"
                 })
                 .end((err, res) => {
                     expect(res).to.have.status(200);
@@ -51,15 +51,15 @@ describe('Event Management Platform', () => {
             chai.request(app)
                 .post('/users/login')
                 .send({
-                    name: "user",
-                    password: "password",
-                    email: "email@gmail.com",
-                    role: "Organiser"
+                    name: 'testuser',
+                    password: 'testpassword',
+                    email: "test@gmail.com",
+                    role: "organizer"
                 })
                 .end((err, res) => {
                     expect(res).to.have.status(200);
                     expect(res.body).to.have.property('token');
-                    token = res.body.token; // Save token for later authenticated requests
+                    token = res.body.token;
                     done();
                 });
         });
@@ -70,8 +70,8 @@ describe('Event Management Platform', () => {
                 .send({
                     name: 'user',
                     password: 'wrongpassword',
-                    email: "email@gmail.com",
-                    role: "Organiser"
+                    email: "test@gmail.com",
+                    role: "Organizer"
                 })
                 .end((err, res) => {
                     expect(res).to.have.status(401);
@@ -97,7 +97,7 @@ describe('Event Management Platform', () => {
                     .end((err, res) => {
                         expect(res).to.have.status(201);
                         expect(res.body).to.have.property('message').eql('Event created successfully');
-                        eventId = res.body.event.id; // Save event ID for later operations
+                        eventId = res.body.event._id;
                         done();
                     });
             });
@@ -122,7 +122,7 @@ describe('Event Management Platform', () => {
             });
         });
 
-        // Delete event
+        //Delete event
         describe('DELETE /events/:id', () => {
             it('should delete the event', (done) => {
                 chai.request(app)
@@ -140,9 +140,8 @@ describe('Event Management Platform', () => {
     // Event registration
     describe('POST /events/:id/register', () => {
         it('should register a user for an event', (done) => {
-            // Assuming the event with ID eventId exists
             chai.request(app)
-                .post(`/events/${1}/register`)
+                .post(`/events/${eventId}/register`)
                 .set('Authorization', `Bearer ${token}`)
                 .end((err, res) => {
                     expect(res).to.have.status(200);
@@ -153,7 +152,7 @@ describe('Event Management Platform', () => {
 
         it('should not allow registration for a non-existent event', (done) => {
             chai.request(app)
-                .post(`/events/invalidId/register`)
+                .post(`/events/${"66c204fad17e4d35b7b94cf2"}/register`)
                 .set('Authorization', `Bearer ${token}`)
                 .end((err, res) => {
                     expect(res).to.have.status(404);

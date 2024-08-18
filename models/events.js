@@ -2,11 +2,10 @@ const mongoose = require("mongoose");
 
 const events = new mongoose.Schema([
     {
-        id: Number,
         description: String,
         date: String,
         time: String,
-        participants: []
+        participants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
     }
 ]);
 

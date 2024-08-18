@@ -1,61 +1,53 @@
 const jwt = require('jsonwebtoken');
 const sendEmail = require("./emailSender");
-const { getMaxListeners } = require('../models/events');
+const Event = require('../models/events');
 
-let events = [{
-    id: 1,
-    date: '2024-08-30',
-    time: '10:00',
-    description: 'Sample Event',
-    participants: []
-}];
-let users = [];
+const getEvent = async () => {
+    return await Event.find();
+};
 
-const findEventById = (id) => events.find(event => event.id === id);
-const findUserById = (id) => users.find(user => user.id === id);
-
-// Create a new event
 const createEvent = async (eventData, user) => {
     if (user.role !== 'organizer') {
         throw new Error('Not authorized');
     }
-    const newEvent = {
-        id: events.length + 1,
-        ...eventData,
+    const newEvent = new Event({
+        date: eventData.date,
+        time: eventData.time,
+        description: eventData.description,
         participants: []
-    };
-    events.push(newEvent);
+    });
+    newEvent.save();
     return newEvent;
 };
 
-// Update an existing event
 const updateEvent = async (eventId, eventData, user) => {
-    const event = findEventById(parseInt(eventId));
+    const event = await Event.findOne({ _id: eventId });
     if (!event) {
         throw new Error('Event not found');
     }
     if (user.role !== 'organizer') {
         throw new Error('Not authorized');
     }
-    Object.assign(event, eventData);
+    event.time = eventData.time;
+    event.date = eventData.date;
+    event.description = eventData.description;
+    event.save();
     return event;
 };
 
-// Delete an event
 const deleteEvent = async (eventId, user) => {
-    const eventIndex = events.findIndex(event => event.id === parseInt(eventId));
-    if (eventIndex === -1) {
+    const event = await Event.findOne({ _id: eventId });
+    if (!event) {
         throw new Error('Event not found');
     }
     if (user.role !== 'organizer') {
         throw new Error('Not authorized');
     }
-    events.splice(eventIndex, 1);
+    await Event.deleteOne({ _id: eventId });
 };
 
-// Register a user for an event
 const registerForEvent = async (eventId, user) => {
-    const event = findEventById(parseInt(eventId));
+    const event = await Event.findOne({ _id: eventId });
     if (!event) {
         throw new Error('Event not found');
     }
@@ -63,8 +55,8 @@ const registerForEvent = async (eventId, user) => {
         throw new Error('User already registered for this event');
     }
     event.participants.push(user.id);
-    //sendEmail(user.email);
-    sendEmail("mayameena147@gmail.com");
+    sendEmail(user.email);
+    //sendEmail("mayameena147@gmail.com");
 };
 
-module.exports = { createEvent, updateEvent, deleteEvent, registerForEvent}
+module.exports = { getEvent, createEvent, updateEvent, deleteEvent, registerForEvent}

@@ -1,7 +1,14 @@
-// controllers/eventController.js
 const eventService = require('./../services/eventService');
 
-// Create a new event
+const getEvent = async (req, res) => {
+    try {
+        const event = await eventService.getEvent();
+        res.status(201).json({ event });
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+};
+
 const createEvent = async (req, res) => {
     try {
         const event = await eventService.createEvent(req.body, req.user);
@@ -11,7 +18,6 @@ const createEvent = async (req, res) => {
     }
 };
 
-// Update an existing event
 const updateEvent = async (req, res) => {
     try {
         const event = await eventService.updateEvent(req.params.id, req.body, req.user);
@@ -21,7 +27,6 @@ const updateEvent = async (req, res) => {
     }
 };
 
-// Delete an event
 const deleteEvent = async (req, res) => {
     try {
         await eventService.deleteEvent(req.params.id, req.user);
@@ -31,7 +36,6 @@ const deleteEvent = async (req, res) => {
     }
 };
 
-// Register a user for an event
 const registerForEvent = async (req, res) => {
     try {
         await eventService.registerForEvent(req.params.id, req.user);
@@ -41,4 +45,4 @@ const registerForEvent = async (req, res) => {
     }
 };
 
-module.exports = { createEvent, updateEvent, deleteEvent, registerForEvent }
+module.exports = { getEvent, createEvent, updateEvent, deleteEvent, registerForEvent }

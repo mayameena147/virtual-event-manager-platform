@@ -1,7 +1,7 @@
-const users = require("../models/users.js");
+const User = require("../models/users.js");
 const jwt = require("jsonwebtoken");
 
-const authenticate = (req, res, next) => {
+const authenticate = async (req, res, next) => {
     const authHeader = req.headers['authorization'];
     if (!authHeader) return res.status(401).json({ error: 'No token provided' });
 
@@ -9,7 +9,7 @@ const authenticate = (req, res, next) => {
 
      try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
-        req.user = users.find(u => u.name = decoded.name);
+        req.user = await User.findOne({ name : decoded.name });
         next();
         
     } catch (error) {

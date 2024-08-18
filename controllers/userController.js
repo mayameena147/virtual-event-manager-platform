@@ -1,18 +1,17 @@
-const users = require("../models/users.js");
+const User = require("../models/users");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 async function registerUser(req, res) {
     const body = req.body;
     if(body.name && body.password && body.email && body.role){
-        const newUser = {};
-        newUser.id = users.slice(-1,0).id + 1;
+        const newUser = new User();
         newUser.name = body.name;
         newUser.password = bcrypt.hashSync(body.password, 10);
         newUser.role = body.role;
         newUser.email = body.email;
 
-        users.push(newUser);
+        await newUser.save();
         res.status(200).send({message: "User registered successfully"});      
     }
     else {
@@ -24,7 +23,9 @@ async function loginUser(req, res) {
 
     const body = req.body;
     if(body.email && body.password){
-        const user = users.find(u => u.email == body.email);
+        const user = await User.findOne({ email: body.email});
+        console.log("body: " + body.email);
+        console.log("user details: " + user);
         if(user) {
             const match = bcrypt.compareSync(body.password, user.password);
             if (match) {

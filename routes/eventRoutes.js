@@ -1,8 +1,9 @@
 const express = require("express");
 const eventRouter = express.Router();
-const { createEvent, updateEvent, deleteEvent, registerForEvent } = require("../controllers/eventController");
+const { getEvent, createEvent, updateEvent, deleteEvent, registerForEvent } = require("../controllers/eventController");
 const authenticate = require("./../middlewares/auth");
 
+eventRouter.get("/", authenticate, getEvent);
 eventRouter.post("/", authenticate, createEvent);
 eventRouter.put("/:id", authenticate, updateEvent);
 eventRouter.delete("/:id", authenticate, deleteEvent);
